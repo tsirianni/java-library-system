@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class ClientService {
-    public AddClientDTO promptDTO(Scanner scanner) {
+    private AddClientDTO promptDTO(Scanner scanner) {
         PrintColoured.cyan("What is the client's name? ");
         String name = scanner.next();
 
@@ -53,5 +53,24 @@ public class ClientService {
 
     private String formatRecord(Client newClient) {
         return String.format("%s;%s;%s\n", newClient.getId(), newClient.getName(), newClient.getEmail());
+    }
+
+    public void findAllClients() throws Exception {
+        Path clientsDBPath = Paths.get("src/resources/clients.csv");
+        List<String> clients;
+        try {
+            clients = Files.readAllLines(clientsDBPath);
+        } catch (IOException IOEx) {
+            throw new Exception("DB Error: Unable to obtain client's records");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        for (String client : clients) {
+            String[] clientDetails = client.split(";");
+            PrintColoured.green(String.format("ID.: %-30s - Name.: %-25s - Email Address.: %s", clientDetails[0],
+                                              clientDetails[1], clientDetails[2]
+            ));
+        }
     }
 }

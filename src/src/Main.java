@@ -21,6 +21,9 @@ public class Main {
                 clientService.addClient(scanner);
                 PrintColoured.green("Client successfully registered");
                 break;
+            case LIST_CLIENTS:
+                PrintColoured.green("You have chosen to list all clients");
+                clientService.findAllClients();
             case ADD_BOOK:
                 PrintColoured.green("You have chosen to add a book");
                 break;
@@ -41,6 +44,7 @@ public class Main {
     }
 
     public static void showMenu() {
-        PrintColoured.cyan("Register a client: 1\n");
+        PrintColoured.cyan(String.format("%-25s --> %d", "Register a client:", 1));
+        PrintColoured.cyan(String.format("%-25s --> %d", "List all client:", 2));
     }
 }
