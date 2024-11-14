@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+import Book.BookService;
 import Client.ClientService;
 import utils.Actions;
 import utils.PrintColoured;
@@ -8,12 +9,13 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         ClientService clientService = new ClientService();
+        BookService bookService = new BookService();
 
         PrintColoured.cyan("\nWhat would you like to do?\n");
         showMenu();
         PrintColoured.white("\nI would like to (number):");
 
-        Actions chosenAction = Actions.fromCode(Integer.parseInt(scanner.next()));
+        Actions chosenAction = Actions.fromCode(Integer.parseInt(scanner.nextLine()));
 
         switch (chosenAction) {
             case ADD_CLIENT:
@@ -25,7 +27,9 @@ public class Main {
                 PrintColoured.green("You have chosen to list all clients");
                 clientService.findAllClients();
             case ADD_BOOK:
-                PrintColoured.green("You have chosen to add a book");
+                PrintColoured.green("You have chosen to register a book");
+                bookService.addBook(scanner);
+                PrintColoured.green("Book successfully registered");
                 break;
             case LIST_BOOKS:
                 PrintColoured.green("You have chosen to list all available books");
@@ -46,5 +50,6 @@ public class Main {
     public static void showMenu() {
         PrintColoured.cyan(String.format("%-25s --> %d", "Register a client:", 1));
         PrintColoured.cyan(String.format("%-25s --> %d", "List all client:", 2));
+        PrintColoured.cyan(String.format("%-25s --> %d", "Register a book:", 3));
     }
 }

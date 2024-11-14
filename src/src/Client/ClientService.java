@@ -14,10 +14,10 @@ import java.util.Scanner;
 public class ClientService {
     private AddClientDTO promptDTO(Scanner scanner) {
         PrintColoured.cyan("What is the client's name? ");
-        String name = scanner.next();
+        String name = scanner.nextLine();
 
         PrintColoured.cyan("What is the client's email address? ");
-        String email = scanner.next();
+        String email = scanner.nextLine();
 
         return new AddClientDTO(name, email);
     }
