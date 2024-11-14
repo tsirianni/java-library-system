@@ -18,8 +18,8 @@ public class Main {
         switch (chosenAction) {
             case ADD_CLIENT:
                 PrintColoured.green("You have chosen to register a client");
-//                clientService.addClient(scanner);
-//                PrintColoured.green("Client successfully registered");
+                clientService.addClient(scanner);
+                PrintColoured.green("Client successfully registered");
                 break;
             case ADD_BOOK:
                 PrintColoured.green("You have chosen to add a book");
