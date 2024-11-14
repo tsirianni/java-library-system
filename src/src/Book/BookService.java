@@ -31,7 +31,7 @@ public class BookService {
         try {
             books = Files.readAllLines(booksDBPath);
         } catch (IOException IOEx) {
-            throw new Exception("DB Error: Unable to obtain client's records");
+            throw new Exception("DB Error: Unable to obtain books' records");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -58,5 +58,27 @@ public class BookService {
         return String.format("%s;%s;%s;%b;%s;%s", newBook.getId(), newBook.getTitle(), newBook.getAuthor(),
                              newBook.isAvailable(), newBook.getCreatedAt(), newBook.getUpdatedAt()
         );
+    }
+
+    public void findAllBooks() throws Exception {
+        Path booksDBPath = Paths.get("src/resources/books.csv");
+        List<String> books;
+        try {
+            books = Files.readAllLines(booksDBPath);
+        } catch (IOException IOEx) {
+            throw new Exception("DB Error: Unable to obtain books' records");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        for (String book : books) {
+            String[] bookDetails = book.split(";");
+            PrintColoured.green(String.format("ID.: %-30s - Title.: %-25s - Author.: %-25s - Available.: %-10b",
+                                              bookDetails[0],
+                                              bookDetails[1], bookDetails[2], bookDetails[3]
+            ));
+
+        }
     }
 }

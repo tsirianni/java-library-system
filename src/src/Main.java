@@ -33,6 +33,7 @@ public class Main {
                 break;
             case LIST_BOOKS:
                 PrintColoured.green("You have chosen to list all available books");
+                bookService.findAllBooks();
                 break;
             case RETURN_BOOK:
                 PrintColoured.green("You have chosen to return a checked-out book");
@@ -51,5 +52,6 @@ public class Main {
         PrintColoured.cyan(String.format("%-25s --> %d", "Register a client:", 1));
         PrintColoured.cyan(String.format("%-25s --> %d", "List all client:", 2));
         PrintColoured.cyan(String.format("%-25s --> %d", "Register a book:", 3));
+        PrintColoured.cyan(String.format("%-25s --> %d", "List all books:", 4));
     }
 }
