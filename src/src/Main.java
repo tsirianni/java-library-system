@@ -51,8 +51,12 @@ public class Main {
                 break;
             case CHECKOUT_BOOK:
                 PrintColoured.green("You have chosen to checkout a book");
-                checkoutService.checkoutBook(scanner);
-                PrintColoured.green("Book successfully checked out");
+                boolean proceeded = checkoutService.checkoutBook(scanner);
+                if (proceeded) {
+                    PrintColoured.green("Book successfully checked out");
+                } else {
+                    PrintColoured.red("Unsuccessful book checkout");
+                }
                 break;
             case RETURN_BOOK:
                 PrintColoured.green("You have chosen to return a checked-out book");
