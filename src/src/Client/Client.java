@@ -1,7 +1,5 @@
 package Client;
 
-import Client.DTOs.AddClientDTO;
-
 import java.util.UUID;
 
 public class Client {
@@ -10,10 +8,10 @@ public class Client {
     public String email;
 
 
-    public Client(AddClientDTO data) {
-        this.name = data.name();
-        this.email = data.email();
-        this.id = UUID.randomUUID();
+    public Client(UUID id, String name, String email) {
+        this.name = name;
+        this.email = email;
+        this.id = id;
     }
 
     public UUID getId() {

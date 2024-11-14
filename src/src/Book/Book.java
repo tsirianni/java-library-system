@@ -1,18 +1,20 @@
 package Book;
 
+import Author.Author;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Book {
     public UUID id;
     public String title;
-    public String author;
+    public Author author;
     public boolean available;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 
     public Book(
-            UUID id, String title, String author, boolean available, LocalDateTime createdAt,
+            UUID id, String title, Author author, boolean available, LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {
         this.id = id;
@@ -31,7 +33,7 @@ public class Book {
         return title;
     }
 
-    public String getAuthor() {
+    public Author getAuthor() {
         return author;
     }
 
@@ -45,5 +47,9 @@ public class Book {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }

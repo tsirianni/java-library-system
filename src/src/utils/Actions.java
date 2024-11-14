@@ -3,11 +3,13 @@ package utils;
 public enum Actions {
     ADD_CLIENT(1),
     LIST_CLIENTS(2),
-    ADD_BOOK(3),
-    LIST_BOOKS(4),
-    CHECKOUT_BOOK(5),
-    RETURN_BOOK(6),
-    VIEW_CHECKOUT_HISTORY(7);
+    ADD_AUTHOR(3),
+    LIST_AUTHORS(4),
+    ADD_BOOK(5),
+    LIST_BOOKS(6),
+    CHECKOUT_BOOK(7),
+    RETURN_BOOK(8),
+    VIEW_CHECKOUT_HISTORY(9);
 
 
     private final int actionCode;

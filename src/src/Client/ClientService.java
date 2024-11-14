@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 
 public class ClientService {
+    private final Path clientsDBPath = Paths.get("src/resources/clients.csv");
+
     private AddClientDTO promptDTO(Scanner scanner) {
         PrintColoured.cyan("What is the client's name? ");
         String name = scanner.nextLine();
@@ -25,52 +26,65 @@ public class ClientService {
     public void addClient(Scanner scanner) throws Exception {
         AddClientDTO data = this.promptDTO(scanner);
 
-        Path clientsDBPath = Paths.get("src/resources/clients.csv");
-        List<String> clients;
+        List<Client> clients = this.findAllClients(false);
+        Optional<Client> existingClient = clients.stream().filter(client -> Objects.equals(
+                client.getEmail(),
+                data.email()
+        )).findFirst();
+
+        if (existingClient.isPresent()) {
+            throw new IllegalArgumentException("The is already a client registered with the provided email " +
+                                                       "address");
+        }
+
+        Client newClient = new Client(UUID.randomUUID(), data.name(), data.email());
+        String formattedRecord = this.formatRecord(newClient);
+
         try {
-            clients = Files.readAllLines(clientsDBPath);
+            Files.writeString(this.clientsDBPath, formattedRecord, StandardOpenOption.APPEND,
+                              StandardOpenOption.CREATE
+            );
         } catch (IOException IOEx) {
-            throw new Exception("DB Error: Unable to obtain client's records");
+            throw new Exception("DB Error: An error has occurred while attempting to register the new client " + IOEx.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        String content = "";
-        for (String client : clients) {
-            String[] clientDetails = client.split(";");
-            String clientEmail = clientDetails[2];
-            if (Objects.equals(clientEmail, data.email())) {
-                throw new IllegalArgumentException("The is already a client registered with the provided email " +
-                                                           "address");
-            }
-            content = content.concat(client.concat("\n"));
-        }
-
-        Client newClient = new Client(data);
-        String formattedRecord = this.formatRecord(newClient);
-        Files.writeString(clientsDBPath, content.concat(formattedRecord));
     }
 
     private String formatRecord(Client newClient) {
         return String.format("%s;%s;%s\n", newClient.getId(), newClient.getName(), newClient.getEmail());
     }
 
-    public void findAllClients() throws Exception {
-        Path clientsDBPath = Paths.get("src/resources/clients.csv");
-        List<String> clients;
+    public List<Client> findAllClients(boolean shouldConsoleClients) throws Exception {
+
+        List<String> clientRecords;
         try {
-            clients = Files.readAllLines(clientsDBPath);
+            clientRecords = Files.readAllLines(this.clientsDBPath);
         } catch (IOException IOEx) {
             throw new Exception("DB Error: Unable to obtain client's records");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        for (String client : clients) {
-            String[] clientDetails = client.split(";");
-            PrintColoured.green(String.format("ID.: %-30s - Name.: %-25s - Email Address.: %s", clientDetails[0],
-                                              clientDetails[1], clientDetails[2]
-            ));
+        List<Client> clients = new ArrayList<>();
+
+        if (!clientRecords.isEmpty()) {
+            for (String clientRecord : clientRecords) {
+                String[] clientDetails = clientRecord.split(";");
+                Client client = new Client(UUID.fromString(clientDetails[0]), clientDetails[1],
+                                           clientDetails[2]
+                );
+                clients.add(client);
+
+                if (shouldConsoleClients) {
+                    PrintColoured.green(String.format("ID.: %-30s - Name.: %-25s - Email Address.: %s", client.getId(),
+                                                      client.getName(), client.getEmail()
+                    ));
+                }
+            }
         }
+
+        return clients;
     }
 }
