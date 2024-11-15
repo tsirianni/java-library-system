@@ -3,7 +3,9 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import Author.Author;
 import Author.AuthorService;
+import Book.Book;
 import Book.BookService;
 import Checkout.CheckoutService;
 import Client.Client;
@@ -65,8 +67,8 @@ public class Main {
         switch (chosenAction) {
             case ADD_CLIENT:
                 PrintColoured.green("You have chosen to register a client");
-                clientService.addClient(scanner);
-                PrintColoured.green("Client successfully registered");
+                Client newClient = clientService.addClient(scanner);
+                PrintColoured.green(String.format("Client %s successfully registered", newClient.getName()));
                 break;
             case LIST_CLIENTS:
                 PrintColoured.green("You have chosen to list all clients");
@@ -74,8 +76,8 @@ public class Main {
                 break;
             case ADD_AUTHOR:
                 PrintColoured.green("You have chosen to register an author");
-                authorService.addAuthor(scanner);
-                PrintColoured.green("Author successfully registered");
+                Author author = authorService.addAuthor(scanner);
+                PrintColoured.green(String.format("Author %s successfully registered", author.getName()));
                 break;
             case LIST_AUTHORS:
                 PrintColoured.green("You have chosen to list all authors");
@@ -83,8 +85,8 @@ public class Main {
                 break;
             case ADD_BOOK:
                 PrintColoured.green("You have chosen to register a book");
-                bookService.addBook(scanner);
-                PrintColoured.green("Book successfully registered");
+                Book newBook = bookService.addBook(scanner);
+                PrintColoured.green(String.format("Book %s successfully registered", newBook.getTitle()));
                 break;
             case LIST_BOOKS:
                 PrintColoured.green("You have chosen to list all available books");

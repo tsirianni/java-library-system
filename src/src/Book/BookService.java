@@ -27,7 +27,7 @@ public class BookService {
         return new AddBookDTO(title, authorId);
     }
 
-    public void addBook(Scanner scanner) throws Exception {
+    public Book addBook(Scanner scanner) throws Exception {
         AddBookDTO data = this.promptDTO(scanner);
 
         List<Author> authors = this.authorService.findAllAuthors(false);
@@ -55,9 +55,18 @@ public class BookService {
         Book newBook = new Book(UUID.randomUUID(), data.title(), existingAuthor.get(), true, today, today);
 
         String formattedBook = this.formatRecord(newBook);
-        Files.writeString(booksDBPath, formattedBook, StandardOpenOption.APPEND,
-                          StandardOpenOption.CREATE
-        );
+
+        try {
+            Files.writeString(booksDBPath, formattedBook, StandardOpenOption.APPEND,
+                              StandardOpenOption.CREATE
+            );
+        } catch (IOException IOEx) {
+            throw new Exception("DB Error: Unable to obtain books' records: " + IOEx.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return newBook;
     }
 
     public String formatRecord(Book newBook) {
@@ -77,36 +86,41 @@ public class BookService {
             throw new RuntimeException(e);
         }
 
-        List<Author> authors = this.authorService.findAllAuthors(false);
         List<Book> books = new ArrayList<>();
+        if (!bookRecords.isEmpty()) {
+            List<Author> authors = this.authorService.findAllAuthors(false);
+            for (String bookRecord : bookRecords) {
+                String[] bookDetails = bookRecord.split(";");
+                Optional<Author> bookAuthor = authors.stream().filter(author -> Objects.equals(
+                        UUID.fromString(bookDetails[2]),
+                        author.getId()
+                )).findFirst();
 
-        for (String bookRecord : bookRecords) {
-            String[] bookDetails = bookRecord.split(";");
-            Optional<Author> bookAuthor = authors.stream().filter(author -> Objects.equals(
-                    UUID.fromString(bookDetails[2]),
-                    author.getId()
-            )).findFirst();
+                if (bookAuthor.isEmpty()) {
+                    throw new Exception("It was not possible to locate the author of one or more books");
+                }
 
-            if (bookAuthor.isEmpty()) {
-                throw new Exception("It was not possible to locate the author of one or more books");
+                Book book = new Book(UUID.fromString(bookDetails[0]), bookDetails[1], bookAuthor.get(),
+                                     Boolean.parseBoolean(bookDetails[3]),
+                                     LocalDateTime.parse(bookDetails[4]),
+                                     LocalDateTime.parse(bookDetails[5])
+                );
+
+                books.add(book);
+
+                if (shouldConsoleBooks) {
+                    PrintColoured.green(String.format("ID.: %-30s - Title.: %-25s - Author.: %-25s - Available.: %-10b",
+                                                      book.getId(),
+                                                      book.getTitle(), book.getAuthor().getName(), book.isAvailable()
+                    ));
+                }
             }
-
-            Book book = new Book(UUID.fromString(bookDetails[0]), bookDetails[1], bookAuthor.get(),
-                                 Boolean.parseBoolean(bookDetails[3]),
-                                 LocalDateTime.parse(bookDetails[4]),
-                                 LocalDateTime.parse(bookDetails[5])
-            );
-
-            books.add(book);
-
+        } else {
             if (shouldConsoleBooks) {
-                PrintColoured.green(String.format("ID.: %-30s - Title.: %-25s - Author.: %-25s - Available.: %-10b",
-                                                  book.getId(),
-                                                  book.getTitle(), book.getAuthor().getName(), book.isAvailable()
-                ));
+                PrintColoured.yellow("There are no books registered");
             }
         }
-
+        
         return books;
     }
 

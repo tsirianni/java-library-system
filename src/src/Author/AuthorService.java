@@ -70,20 +70,26 @@ public class AuthorService {
         }
 
         List<Author> authors = new ArrayList<>();
-        for (String authorRecord : authorRecords) {
-            String[] authorDetails = authorRecord.split(";");
-            Author author = new Author(UUID.fromString(authorDetails[0]), authorDetails[1],
-                                       LocalDateTime.parse(authorDetails[2])
-            );
-
-            authors.add(author);
-
-            if (shouldConsoleAuthors) {
-                PrintColoured.green(String.format("ID.: %-30s - Name.: %-25s - Date of Birth.: %td/%<tm/%<tY",
-                                                  author.getId().toString(), author.getName(),
-                                                  author.getDateOfBirth()
-                                    )
+        if (!authorRecords.isEmpty()) {
+            for (String authorRecord : authorRecords) {
+                String[] authorDetails = authorRecord.split(";");
+                Author author = new Author(UUID.fromString(authorDetails[0]), authorDetails[1],
+                                           LocalDateTime.parse(authorDetails[2])
                 );
+
+                authors.add(author);
+
+                if (shouldConsoleAuthors) {
+                    PrintColoured.green(String.format("ID.: %-30s - Name.: %-25s - Date of Birth.: %td/%<tm/%<tY",
+                                                      author.getId().toString(), author.getName(),
+                                                      author.getDateOfBirth()
+                                        )
+                    );
+                }
+            }
+        } else {
+            if (shouldConsoleAuthors) {
+                PrintColoured.yellow("There are no authors registered");
             }
         }
 

@@ -23,7 +23,7 @@ public class ClientService {
         return new AddClientDTO(name, email);
     }
 
-    public void addClient(Scanner scanner) throws Exception {
+    public Client addClient(Scanner scanner) throws Exception {
         AddClientDTO data = this.promptDTO(scanner);
 
         List<Client> clients = this.findAllClients(false);
@@ -50,6 +50,7 @@ public class ClientService {
             throw new RuntimeException(e);
         }
 
+        return newClient;
     }
 
     private String formatRecord(Client newClient) {
@@ -82,6 +83,10 @@ public class ClientService {
                                                       client.getName(), client.getEmail()
                     ));
                 }
+            }
+        } else {
+            if (shouldConsoleClients) {
+                PrintColoured.yellow("There are no clients registered");
             }
         }
 

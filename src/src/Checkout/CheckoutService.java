@@ -33,21 +33,28 @@ public class CheckoutService {
         if (showBookList.matches()) {
             List<Book> books = bookService.findAllBooks(false);
 
+            List<Book> availableBooks = new ArrayList<>();
             books.forEach(book -> {
                 if (book.isAvailable()) {
-                    PrintColoured.green(String.format("ID.: %-30s - Title.: %-25s - Author.: %-25s",
-                                                      book.getId(),
-                                                      book.getTitle(), book.getAuthor().getName()
-                    ));
+                    availableBooks.add(book);
                 }
             });
-            PrintColoured.cyan("What book would you like to checkout? (book ID) ");
 
+            if (!availableBooks.isEmpty()) {
+                availableBooks.forEach(book -> PrintColoured.green(String.format("ID.: %-30s - Title.: %-25s - Author.: %-25s",
+                                                                                 book.getId(),
+                                                                                 book.getTitle(), book.getAuthor().getName()
+                )));
 
-            String bookId = scanner.nextLine();
-            PrintColoured.cyan("Insert your registered name: ");
-            String clientName = scanner.nextLine();
-            return Optional.of(new CheckoutBookDTO(bookId, clientName));
+                PrintColoured.cyan("What book would you like to checkout? (book ID) ");
+                String bookId = scanner.nextLine();
+                PrintColoured.cyan("Insert your registered name: ");
+                String clientName = scanner.nextLine();
+                return Optional.of(new CheckoutBookDTO(bookId, clientName));
+            } else {
+                PrintColoured.yellow("There are no available books at the moment");
+                return Optional.empty();
+            }
         } else {
             PrintColoured.cyan("Operation cancelled.");
             return Optional.empty();
@@ -128,39 +135,48 @@ public class CheckoutService {
         }
 
         List<Checkout> checkouts = new ArrayList<>();
-        List<Book> books = this.bookService.findAllBooks(false);
+        if (!checkoutRecords.isEmpty()) {
+            List<Book> books = this.bookService.findAllBooks(false);
 
-        for (String checkoutRecord : checkoutRecords) {
-            String[] checkoutDetails = checkoutRecord.split(";");
-            UUID checkedOutBookClientId = UUID.fromString(checkoutDetails[2]);
-            if (Objects.equals(checkedOutBookClientId, clientId)) {
-                boolean hasReturnDate = !Objects.equals(checkoutDetails[4], "null");
-                Checkout checkout = new Checkout(
-                        UUID.fromString(checkoutDetails[0]),
-                        UUID.fromString(checkoutDetails[1]),
-                        checkedOutBookClientId,
-                        LocalDateTime.parse(checkoutDetails[3]),
-                        hasReturnDate ? LocalDateTime.parse(checkoutDetails[4]) : null
-                );
+            for (String checkoutRecord : checkoutRecords) {
+                String[] checkoutDetails = checkoutRecord.split(";");
+                UUID checkedOutBookClientId = UUID.fromString(checkoutDetails[2]);
+                if (Objects.equals(checkedOutBookClientId, clientId)) {
+                    boolean hasReturnDate = !Objects.equals(checkoutDetails[4], "null");
+                    Checkout checkout = new Checkout(
+                            UUID.fromString(checkoutDetails[0]),
+                            UUID.fromString(checkoutDetails[1]),
+                            checkedOutBookClientId,
+                            LocalDateTime.parse(checkoutDetails[3]),
+                            hasReturnDate ? LocalDateTime.parse(checkoutDetails[4]) : null
+                    );
 
-                checkouts.add(checkout);
-                if (shouldConsoleCheckouts) {
+                    checkouts.add(checkout);
+                    if (shouldConsoleCheckouts) {
 
-                    boolean shouldPrintBook = !ignoreReturned || (!hasReturnDate);
-                    if (shouldPrintBook) {
-                        Book checkoutBook =
-                                books.stream().filter(book -> Objects.equals(book.getId(), checkout.getBookId())).findFirst().orElse(null);
+                        boolean shouldPrintBook = !ignoreReturned || (!hasReturnDate);
+                        if (shouldPrintBook) {
+                            Book checkoutBook =
+                                    books.stream().filter(book -> Objects.equals(book.getId(), checkout.getBookId())).findFirst().orElse(null);
 
-                        String returnDateRepresentation = hasReturnDate ? "%td/%<tm/%<tY" : "";
+                            String returnDateRepresentation = hasReturnDate ? "%td/%<tm/%<tY" : "";
 
-                        PrintColoured.green(String.format("ID.: %-30s - Book: %-20s - Checked out at.: %td/%<tm/%<tY - Returned at.: " + returnDateRepresentation, checkout.getId(),
-                                                          checkoutBook != null ? checkoutBook.getTitle() : "book details " + "unavailable",
-                                                          checkout.getCheckedOutAt(), checkout.getReturnedAt()
-                        ));
+                            PrintColoured.green(String.format("ID.: %-30s - Book: %-20s - Checked out at.: %td/%<tm/%<tY - Returned at.: "
+                                                                      + returnDateRepresentation, checkout.getId(),
+                                                              checkoutBook != null ? checkoutBook.getTitle() : "book details " +
+                                                                      "unavailable",
+                                                              checkout.getCheckedOutAt(), checkout.getReturnedAt()
+                            ));
+                        }
                     }
                 }
             }
+        } else {
+            if (shouldConsoleCheckouts) {
+                PrintColoured.yellow("Client has no checked out books");
+            }
         }
+
         return checkouts;
     }
 
