@@ -87,4 +87,10 @@ public class ClientService {
 
         return clients;
     }
+
+    public Optional<Client> findClientByName(String clientName) throws Exception {
+        List<Client> clients = this.findAllClients(false);
+
+        return clients.stream().filter(client1 -> Objects.equals(client1.getName(), clientName)).findFirst();
+    }
 }

@@ -43,4 +43,8 @@ public class Checkout {
     public LocalDateTime getReturnedAt() {
         return returnedAt;
     }
+
+    public void setReturnedAt(LocalDateTime returnedAt) {
+        this.returnedAt = returnedAt;
+    }
 }

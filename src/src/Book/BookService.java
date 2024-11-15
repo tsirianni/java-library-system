@@ -42,7 +42,10 @@ public class BookService {
 
         List<Book> books = this.findAllBooks(false);
         Optional<Book> existingBook =
-                books.stream().filter(book -> Objects.equals(book.getTitle(), data.title()) && Objects.equals(book.getAuthor().getId(), UUID.fromString(data.authorID()))).findFirst();
+                books.stream().filter(book -> Objects.equals(book.getTitle(), data.title()) && Objects.equals(
+                        book.getAuthor().getId(),
+                        UUID.fromString(data.authorID())
+                )).findFirst();
 
         if (existingBook.isPresent()) {
             throw new IllegalArgumentException("There is already a book registered with this title and author");
@@ -105,5 +108,11 @@ public class BookService {
         }
 
         return books;
+    }
+
+    public Optional<Book> findBookById(UUID bookId) throws Exception {
+        List<Book> books = this.findAllBooks(false);
+
+        return books.stream().filter((bk) -> Objects.equals(bk.getId(), bookId)).findFirst();
     }
 }
